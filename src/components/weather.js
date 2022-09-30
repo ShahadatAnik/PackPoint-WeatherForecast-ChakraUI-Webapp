@@ -4,50 +4,94 @@ import {
   Flex,
   Heading,
   Spacer,
-  Box,
-  HStack,
-  Center,
   Stack,
   VStack,
-  StackDivider,
   Container,
+  Text,
+  IconButton,
+  Center,
 } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+import { WiCelsius, WiFahrenheit } from 'react-icons/wi';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
-import Select from 'react-select';
-
 import WeatherInfo from './weatherInfo';
+import { Decision } from './Decision';
 
 export default function Weather() {
   const options = city.map(item => {
     return { value: item, label: item };
   });
+  const [isCelcius, setIsCelcius] = useState(true);
+  const [from, setFrom] = useState([]);
+  const [to, setTo] = useState([]);
+
+  const formateOneDecimal = num => {
+    if (isCelcius) return (num - 273.15).toFixed(1);
+    return (((num - 273.15) * 9) / 5 + 32).toFixed(1);
+  };
+
+  useEffect(() => {
+    formateOneDecimal();
+  }, [isCelcius]);
 
   return (
-    <Container as="section">
-      <Flex alignItems="center" gap="2">
-        <Box p="2">
-          <Heading size="md">What to Take?</Heading>
-        </Box>
+    <Container maxW="container.lg" as="section">
+      <Flex alignItems="center" my={2}>
+        <VStack spacing={0.5} align="center">
+          <Heading
+            as="h1"
+            size="lg"
+            noOfLines={1}
+            color="green.500"
+            fontWeight="bold"
+          >
+            PackPoint
+          </Heading>
+          <Text fontSize="xs" as="b">
+            Check Before Pack
+          </Text>
+        </VStack>
         <Spacer />
-        <ColorModeSwitcher justifySelf="flex-end" />
+        <IconButton
+          size="sm"
+          as="b"
+          variant="ghost"
+          fontSize="5xl"
+          color="green.500"
+          onClick={() => setIsCelcius(!isCelcius)}
+          icon={isCelcius ? <WiFahrenheit /> : <WiCelsius />}
+        />
+
+        <Spacer />
+        <ColorModeSwitcher />
       </Flex>
       <Stack
         Stack
         direction={['column', 'column', 'row']}
-        spacing={['6', '6', '5']}
-        divider={<StackDivider borderColor="gray.200" />}
+        spacing={['3', '3', '6']}
         justify="center"
-        mt="5"
+        mt={2}
       >
         {options && (
-          <WeatherInfo props={{ city: options, placeholder: 'From' }} />
+          <WeatherInfo
+            city={options}
+            placeholder={'From'}
+            doCelcius={formateOneDecimal}
+            infoData={setFrom}
+          />
         )}
 
         {options && (
-          <WeatherInfo props={{ city: options, placeholder: 'To' }} />
+          <WeatherInfo
+            city={options}
+            placeholder={'To'}
+            doCelcius={formateOneDecimal}
+            infoData={setTo}
+          />
         )}
       </Stack>
+      <Center>
+        <Decision from={from} to={to} />
+      </Center>
     </Container>
   );
 }
