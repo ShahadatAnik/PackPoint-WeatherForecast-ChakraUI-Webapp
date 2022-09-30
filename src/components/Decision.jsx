@@ -9,7 +9,7 @@ function CityWeather({ name, country, desc }) {
       color="green.500"
       as={'b'}
     >
-      {name},{country}
+      {name}, {country}
       <br />
       <Highlight
         query={desc}

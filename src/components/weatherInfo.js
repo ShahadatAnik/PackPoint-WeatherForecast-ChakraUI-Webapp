@@ -11,6 +11,7 @@ import {
   Text,
   Highlight,
 } from '@chakra-ui/react';
+import AsyncSelect from 'react-select/async';
 import { WiHumidity } from 'react-icons/wi';
 import { GiMightyForce, GiSunrise, GiSunset } from 'react-icons/gi';
 import { MdNaturePeople } from 'react-icons/md';
@@ -117,7 +118,21 @@ function WeatherInfo({ city, placeholder, doCelcius, infoData }) {
 
   useEffect(() => {
     fetchData(query);
+    promiseOptions(query);
   }, [query]);
+
+  const filterColors = input => {
+    return city.filter(i =>
+      i.label.toLowerCase().includes(input.toLowerCase())
+    );
+  };
+
+  const promiseOptions = query =>
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve(filterColors(query));
+      }, 1000);
+    });
 
   return (
     <Stack direction={['column', 'column', 'column']} spacing="1px">
@@ -129,6 +144,15 @@ function WeatherInfo({ city, placeholder, doCelcius, infoData }) {
           closeMenuOnSelect={true}
           onChange={e => setQuery(e.value)}
         />
+        {/* <AsyncSelect
+          cacheOptions
+          defaultOptions
+          loadOptions={promiseOptions}
+          styles={customStyles}
+          placeholder={placeholder}
+          closeMenuOnSelect={true}
+          onChange={e => setQuery(e.value)}
+        /> */}
       </Box>
       <Box p={2}>
         {isLoading && (
