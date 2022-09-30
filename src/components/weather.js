@@ -4,41 +4,29 @@ import {
   Flex,
   Heading,
   Spacer,
-  Box,
-  HStack,
-  Center,
   Stack,
   VStack,
-  StackDivider,
   Container,
-  useBoolean,
-  Switch,
   Text,
-  Tooltip,
   IconButton,
+  Center,
 } from '@chakra-ui/react';
 import { WiCelsius, WiFahrenheit } from 'react-icons/wi';
-import { SearchIcon } from '@chakra-ui/icons';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
-import Select from 'react-select';
-
 import WeatherInfo from './weatherInfo';
+import { Decision } from './Decision';
 
 export default function Weather() {
   const options = city.map(item => {
     return { value: item, label: item };
   });
   const [isCelcius, setIsCelcius] = useState(true);
-  console.log(isCelcius);
+  const [from, setFrom] = useState([]);
+  const [to, setTo] = useState([]);
+
   const formateOneDecimal = num => {
-    var n;
-    if (isCelcius) {
-      n = num - 273.15;
-      return n.toFixed(1);
-    } else {
-      n = ((num - 273.15) * 9) / 5 + 32;
-      return n.toFixed(1);
-    }
+    if (isCelcius) return (num - 273.15).toFixed(1);
+    return (((num - 273.15) * 9) / 5 + 32).toFixed(1);
   };
 
   useEffect(() => {
@@ -46,43 +34,49 @@ export default function Weather() {
   }, [isCelcius]);
 
   return (
-    <Container as="section">
-      <Flex alignItems="center">
-        <Heading
-          as="h1"
-          size="lg"
-          noOfLines={1}
-          color="green.600"
-          fontWeight="bold"
-        >
-          CheckBeforePack
-        </Heading>
+    <Container maxW="container.lg" as="section">
+      <Flex alignItems="center" my={2}>
+        <VStack spacing={0.5} align="center">
+          <Heading
+            as="h1"
+            size="lg"
+            noOfLines={1}
+            color="green.500"
+            fontWeight="bold"
+          >
+            PackPoint
+          </Heading>
+          <Text fontSize="xs" as="b">
+            Check Before Pack
+          </Text>
+        </VStack>
         <Spacer />
         <IconButton
           size="sm"
           as="b"
           variant="ghost"
           fontSize="5xl"
-          color="green.600"
+          color="green.500"
           onClick={() => setIsCelcius(!isCelcius)}
           icon={isCelcius ? <WiFahrenheit /> : <WiCelsius />}
         />
 
         <Spacer />
-        <ColorModeSwitcher justifySelf="flex-end" />
+        <ColorModeSwitcher />
       </Flex>
       <Stack
         Stack
         direction={['column', 'column', 'row']}
-        spacing={['6', '6', '3']}
+        spacing={['3', '3', '6']}
         justify="center"
-        mt="5"
+        mt={2}
       >
         {options && (
           <WeatherInfo
             city={options}
             placeholder={'From'}
             doCelcius={formateOneDecimal}
+            infoData={setFrom}
           />
         )}
 
@@ -91,9 +85,13 @@ export default function Weather() {
             city={options}
             placeholder={'To'}
             doCelcius={formateOneDecimal}
+            infoData={setTo}
           />
         )}
       </Stack>
+      <Center>
+        <Decision from={from} to={to} />
+      </Center>
     </Container>
   );
 }

@@ -1,30 +1,21 @@
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 import {
-  Flex,
-  SelectList,
-  SelectOption,
-  SelectInputValue,
-  Heading,
-  Spacer,
   Box,
   HStack,
   Center,
-  Wrap,
   VStack,
   Stack,
   CircularProgress,
-  useBoolean,
-  Img,
   Image,
   Text,
   Highlight,
-  Icon,
 } from '@chakra-ui/react';
 import { WiHumidity } from 'react-icons/wi';
 import { GiMightyForce, GiSunrise, GiSunset } from 'react-icons/gi';
 import { MdNaturePeople } from 'react-icons/md';
 import { FaArrowUp, FaArrowDown, FaWind } from 'react-icons/fa';
+
 const API = {
   key: '834bb64c903346b8196dbbd32d6ce233',
   base: 'https://api.openweathermap.org/data/2.5/',
@@ -55,18 +46,18 @@ const customStyles = {
     border: '1px solid #e2e8f0',
     borderRadius: '0.25rem',
     padding: '0.5rem 1rem',
-    color: 'green.600',
+    color: 'green.500',
     backgroundColor: 'white',
     fontSize: '1rem',
     lineHeight: '1.5',
     fontWeight: '400',
     boxShadow: '0 10px 15px 0 rgba(0, 0, 0, 0.1)',
     '&:hover': {
-      borderColor: 'green.600',
+      borderColor: 'green.500',
       boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
     },
     '&:focus': {
-      borderColor: 'green.600',
+      borderColor: 'green.500',
       boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
     },
   }),
@@ -101,16 +92,7 @@ function UnixToTime(unix) {
   return formattedTime;
 }
 
-function UnixToDate(unix) {
-  var date = new Date(unix * 1000);
-  var day = date.getDate();
-  var month = date.getMonth() + 1;
-  var year = date.getFullYear();
-  var formattedDate = day + '/' + month + '/' + year;
-  return formattedDate;
-}
-
-function WeatherInfo({ city, placeholder, doCelcius }) {
+function WeatherInfo({ city, placeholder, doCelcius, infoData }) {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -124,6 +106,7 @@ function WeatherInfo({ city, placeholder, doCelcius }) {
       );
       const data = await response.json();
       setWeather(data);
+      infoData(data);
       setIsLoading(false);
       setError(null);
     } catch (error) {
@@ -137,7 +120,7 @@ function WeatherInfo({ city, placeholder, doCelcius }) {
   }, [query]);
 
   return (
-    <Stack direction={['column', 'column', 'column']} spacing={[2, 4, 6]}>
+    <Stack direction={['column', 'column', 'column']} spacing="1px">
       <Box p={2}>
         <Select
           styles={customStyles}
@@ -150,23 +133,21 @@ function WeatherInfo({ city, placeholder, doCelcius }) {
       <Box p={2}>
         {isLoading && (
           <Center>
-            <CircularProgress isIndeterminate color="green.600" />
+            <CircularProgress isIndeterminate color="green.500" />
           </Center>
         )}
         {weather.name && !isLoading && !error && (
-          <Box p={5} rounded="md" boxShadow="2xl" alignContent="center">
-            <VStack spacing={['2', '2', '4']}>
+          <Box p={5} rounded="lg" boxShadow="2xl" alignContent="center">
+            <VStack spacing={2}>
               <Box>
-                <span>
-                  <Text
-                    as="b"
-                    fontSize={['5xl', '5xl', '7xl']}
-                    color="green.600"
-                    textAlign="center"
-                  >
-                    {doCelcius(weather.main.temp)}°
-                  </Text>
-                </span>
+                <Text
+                  as="b"
+                  fontSize={['5xl', '5xl', '7xl']}
+                  color="green.500"
+                  textAlign="center"
+                >
+                  {doCelcius(weather.main.temp)}°
+                </Text>
               </Box>
               <HStack spacing={3}>
                 <Box>
@@ -175,7 +156,11 @@ function WeatherInfo({ city, placeholder, doCelcius }) {
                   />
                 </Box>
                 <Box>
-                  <Text fontSize={['2xl', '1xl', '3xl']} as="b">
+                  <Text
+                    fontSize={['2xl', '1xl', '3xl']}
+                    as="b"
+                    css={{ textTransform: 'capitalize' }}
+                  >
                     <Highlight
                       query={weather.weather[0].main}
                       styles={{
@@ -202,11 +187,13 @@ function WeatherInfo({ city, placeholder, doCelcius }) {
                   {doCelcius(weather.main.temp_max) + '°'}
                 </Tem>
               </HStack>
+
               <HStack spacing={[2, 4, 6]} align="center" pt={6}>
                 <Tem icon={FaWind}>{weather.wind.speed + 'mph'}</Tem>
                 <Tem icon={WiHumidity}>{weather.main.humidity + '%'}</Tem>
                 <Tem icon={GiMightyForce}>{weather.main.pressure + 'hPa'}</Tem>
               </HStack>
+
               <HStack spacing={6} align="center" pt={6}>
                 <Tem icon={GiSunrise}>{UnixToTime(weather.sys.sunrise)}</Tem>
                 {/* <Tem icon={GiSunrise}>{UnixToDate(weather.dt)}</Tem> */}
